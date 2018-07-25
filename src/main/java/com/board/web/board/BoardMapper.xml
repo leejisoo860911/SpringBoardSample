@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoardMapper">
+	<!-- SQL 공동조각 -->
+	<sql id="search">
+		<if test="searchType != null" > 
+			<if test="searchType == 't'.toString()">
+				and title like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType == 'c'.toString()">
+				and content like CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType == 'w'.toString()">
+				and writer like CONCAT('%', #{keyword}, '%')
+			</if>     
+			<if test="searchType == 'tc'.toString()">
+				and (
+					   title like CONCAT('%', #{keyword}, '%')
+					or content like CONCAT('%', #{keyword}, '%')
+					)
+			</if>        
+			<if test="searchType == 'cw'.toString()">
+				and (
+					   content like CONCAT('%', #{keyword}, '%')
+					or writer like CONCAT('%', #{keyword}, '%')
+					)
+			</if>        
+			<if test="searchType == 'tcw'.toString()">
+				and (
+					   title like CONCAT('%', #{keyword}, '%') 
+					or content like CONCAT('%', #{keyword}, '%') 
+					or writer like CONCAT('%', #{keyword}, '%')
+				    )
+			</if>              
+		</if>  
+	</sql>
+		
+	<select id="select" resultType="com.board.domain.BoardVo">
+		select bno
+		     , title
+		     , content
+		     , writer
+		     , regdate
+		     , viewcnt
+		     , replycnt
+		  from tbl_board
+		 where bno = #{bno}
+	</select>
+	
+	<select id="selectListPage" resultType="com.board.domain.BoardVo">
+		<![CDATA[
+		select bno
+		     , title
+		     , content
+		     , writer
+		     , regdate
+		     , viewcnt
+		     , replycnt
+		  from tbl_board
+		 where bno > 0
+		]]>
+		<include refid="search"></include>
+		<![CDATA[
+		 order by bno desc
+		limit #{startRowNum}, #{perPageNum}
+		]]>
+	</select>
+	
+	<select id="selectBoardTotalCnt" resultType="int">
+		<![CDATA[
+		select count(bno)
+		  from tbl_board
+		 where bno > 0
+		]]>
+		<include refid="search"></include>
+	</select>
+	
+	<update id="update">
+		update tbl_board
+		   set title = #{title}
+		     , content = #{content}
+		 where bno = #{bno}
+	</update>
+	
+	<update id="updateReplyCnt">
+		update tbl_board
+		   set replycnt = replycnt + #{amount}
+		 where bno = #{bno}
+	</update>
+	
+	<update id="updateViewCnt">
+		update tbl_board
+		   set viewcnt = viewcnt + 1
+		 where bno = #{bno}
+	</update>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="bno">
+		insert into tbl_board (
+		       title
+		     , content
+		     , writer
+		      )
+		values (
+			   #{title}
+			 , #{content}
+			 , #{writer}
+			  )
+	</insert>
+
+	<delete id="delete">
+		delete from tbl_board
+		 where bno = #{bno}
+	</delete>
+	
+</mapper>

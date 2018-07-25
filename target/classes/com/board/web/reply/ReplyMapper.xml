@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReplyMapper">
+		
+	<select id="select" resultType="com.board.domain.ReplyVo">
+		select rno
+		     , bno
+		     , content
+		     , writer
+		     , regdate
+		     , upddate
+		  from tbl_reply
+		 where bno = #{bno}
+		 order by rno desc
+	</select>
+	
+	<select id="selectListPage" resultType="com.board.domain.ReplyVo">
+		select rno
+		     , bno
+		     , content
+		     , writer
+		     , regdate
+		     , upddate
+		  from tbl_reply
+		 where bno = #{bno}
+		 order by rno desc
+		 limit #{pageVo.startRowNum}, #{pageVo.perPageNum}
+	</select>
+	
+	<select id="selectTotalCount" resultType="int">
+		select count(rno)
+		  from tbl_reply
+		 where bno = #{bno} 
+	</select>
+	
+	<update id="update">
+		update tbl_reply
+		   set content = #{content}
+		     , upddate = now()
+		 where rno = #{rno}
+	</update>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="rno">
+		insert into tbl_reply (
+		       bno
+		     , content
+		     , writer
+		      )
+		values (
+			   #{bno}
+			 , #{content}
+			 , #{writer}
+			  )
+	</insert>
+
+	<delete id="delete">
+		delete from tbl_reply
+		 where rno = #{rno}
+	</delete>
+	
+	<delete id="deleteByBno">
+		delete from tbl_reply
+		 where bno = #{bno}
+	</delete>
+	
+</mapper>
